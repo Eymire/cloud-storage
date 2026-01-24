@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import DateTime, ForeignKey, func
 from sqlalchemy.orm import Mapped, declarative_base, mapped_column
 
-from src.enums import FileVisibility, UserScope
+from src.enums import FileVisibility, UserScope, UserSubscribePlan
 
 
 Base = declarative_base()
@@ -15,6 +15,7 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(unique=True)
     email: Mapped[str] = mapped_column(unique=True)
+    subscribe_plan: Mapped[UserSubscribePlan] = mapped_column(default=UserSubscribePlan.BASIC)
     scope: Mapped[UserScope] = mapped_column(default=UserScope.USER)
     password_hash: Mapped[str]
 
