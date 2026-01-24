@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: [ "uv", "run", "uvicorn", "--factory", "src.main:create_app", "--host", "0.0.0.0", "--port", "8000", "--workers", "${API_WORKERS_COUNT}" ]
+    command: [ "uv", "run", "uvicorn", "--factory", "src.main:create_app", "--host", "0.0.0.0", "--workers", "${API_WORKERS_COUNT}", "--no-server-header", "--no-date-header" ]
     ports:
       - ${API_PORT}:8000
     volumes:

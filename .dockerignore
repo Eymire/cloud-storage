@@ -2,7 +2,7 @@
 .gitignore
 
 Dockerfile
-.dockeringore
+.dockerignore
 compose.yaml
 
 .venv/
