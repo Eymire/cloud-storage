@@ -4,7 +4,7 @@ from uuid import uuid4
 
 import aiofiles
 from fastapi import HTTPException, UploadFile, status
-from sqlalchemy import delete, func, insert, select, update
+from sqlalchemy import delete, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.models import File as FileModel
@@ -56,13 +56,7 @@ async def add_file(
     user: UserModel,
     file: UploadFile,
 ):
-    stmt = select(func.coalesce(func.sum(FileModel.size), 0)).where(FileModel.user_id == user.id)
-    result = await session.execute(stmt)
-    result = result.scalar_one()
-
-    storage_limit = subscribe_plan_to_storage_limit[user.subscribe_plan]
-
-    if result + file.size > storage_limit:  # type: ignore
+    if user.used_storage + file.size > subscribe_plan_to_storage_limit[user.subscribe_plan]:  # type: ignore
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='Storage limit exceeded.',
@@ -78,6 +72,13 @@ async def add_file(
     except Exception:
         storage_path.unlink(missing_ok=True)
         raise
+
+    stmt = (
+        update(UserModel)
+        .where(UserModel.id == user.id)
+        .values(used_storage=UserModel.used_storage + file.size)
+    )
+    await session.execute(stmt)
 
     stmt = insert(FileModel).values(
         user_id=user.id,
@@ -145,6 +146,13 @@ async def delete_file(
 
     storage_path = Path('storage') / file.stored_name
     storage_path.unlink(missing_ok=True)
+
+    stmt = (
+        update(UserModel)
+        .where(UserModel.id == user_id)
+        .values(used_storage=UserModel.used_storage - file.size)
+    )
+    await session.execute(stmt)
 
     stmt = delete(FileModel).where(FileModel.id == file_id)
     await session.execute(stmt)

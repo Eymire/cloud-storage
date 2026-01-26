@@ -18,6 +18,7 @@ class User(Base):
     subscribe_plan: Mapped[UserSubscribePlan] = mapped_column(default=UserSubscribePlan.BASIC)
     scope: Mapped[UserScope] = mapped_column(default=UserScope.USER)
     password_hash: Mapped[str]
+    used_storage: Mapped[int] = mapped_column(default=0)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
