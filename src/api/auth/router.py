@@ -1,10 +1,12 @@
 from fastapi import APIRouter
 from fastapi.security import HTTPBearer
+from pydantic import EmailStr
 
 from src.dependencies import current_user_access_dep, current_user_refresh_dep, session_dep
 from src.schemas.auth import SignIn as SignInSchema
 from src.schemas.auth import SignUp as SignUpSchema
 from src.schemas.auth import Token as TokenSchema
+from src.schemas.auth import VerifyOTP as VerifyOTPSchema
 from src.schemas.users import UserProfile as UserProfileSchema
 
 from . import services
@@ -17,13 +19,35 @@ router = APIRouter()
 async def sign_up(
     session: session_dep,
     data: SignUpSchema,
+):
+    await services.sign_up(
+        session,
+        data,
+    )
+
+
+@router.post('/verify_otp')
+async def verify_otp(
+    session: session_dep,
+    data: VerifyOTPSchema,
 ) -> TokenSchema:
-    result = await services.sign_up(
+    result = await services.verify_otp(
         session,
         data,
     )
 
     return result  # type: ignore[return-value]
+
+
+@router.post('/resend_otp')
+async def resend_otp(
+    session: session_dep,
+    email: EmailStr,
+):
+    await services.resend_otp(
+        session,
+        email,
+    )
 
 
 @router.post('/sign_in')

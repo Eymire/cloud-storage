@@ -39,6 +39,22 @@ class RefreshToken(Base):
     )
 
 
+class PendingUser(Base):
+    __tablename__ = 'pending_users'
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(unique=True)
+    email: Mapped[str] = mapped_column(unique=True)
+    password_hash: Mapped[str]
+    otp_hash: Mapped[str]
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+    )
+
+
 class File(Base):
     __tablename__ = 'files'
 

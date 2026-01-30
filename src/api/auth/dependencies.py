@@ -1,8 +1,12 @@
 import hashlib
+import secrets
 from collections.abc import Callable, Coroutine
 from datetime import UTC, datetime, timedelta
+from email.message import EmailMessage
+from email.utils import formatdate, make_msgid
 from typing import Annotated, Any, Literal, TypedDict
 
+import aiosmtplib
 import jwt
 from argon2 import PasswordHasher
 from fastapi import Depends, HTTPException, status
@@ -13,7 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database import get_session
 from src.models import RefreshToken as RefreshTokenModel
 from src.models import User as UserModel
-from src.settings import jwt_settings
+from src.settings import auth_settings, smtp_settings
 
 
 PASSWORD_HASHER = PasswordHasher(
@@ -51,7 +55,7 @@ def create_access_token(user_id: int) -> str:
     return create_jwt(
         'access',
         payload,
-        timedelta(minutes=jwt_settings.access_token_lifetime_minutes),
+        timedelta(minutes=auth_settings.jwt_access_lifetime_minutes),
     )
 
 
@@ -68,7 +72,7 @@ async def create_refresh_token(
     token = create_jwt(
         'refresh',
         payload,
-        timedelta(minutes=jwt_settings.refresh_token_lifetime_minutes),
+        timedelta(minutes=auth_settings.jwt_refresh_lifetime_minutes),
     )
 
     token_hash = hashlib.sha256(token.encode()).hexdigest()
@@ -195,3 +199,35 @@ def get_current_user_wrapper(
         return result
 
     return get_current_user
+
+
+def generate_otp() -> str:
+    return ''.join(secrets.choice('0123456789') for _ in range(6))
+
+
+async def send_otp_email(to_email: str, otp: str) -> None:
+    message_text = f"""
+    Підтвердження реєстрації
+
+    Дякуємо за реєстрацію! Ваш код підтвердження: {otp}
+
+    Цей код дійсний протягом {auth_settings.otp_expire_minutes} хвилин.
+
+    Якщо ви не реєструвалися на нашому сервісі, просто проігноруйте цей лист.
+    """
+
+    message = EmailMessage()
+    message['From'] = f'EymireWorld <{smtp_settings.user}>'
+    message['To'] = to_email
+    message['Subject'] = 'Підтвердження реєстрації - OTP код'
+    message['Message-ID'] = make_msgid(domain='eymire.me')
+    message['Date'] = formatdate()
+    message.set_content(message_text)
+
+    async with aiosmtplib.SMTP(
+        hostname=smtp_settings.host,
+        port=smtp_settings.port,
+        username=smtp_settings.user,
+        password=smtp_settings.password,
+    ) as server:
+        await server.send_message(message)

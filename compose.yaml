@@ -4,15 +4,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: [ "uv", "run", "uvicorn", "--factory", "src.main:create_app", "--host", "0.0.0.0", "--workers", "${API_WORKERS_COUNT}", "--no-server-header", "--no-date-header" ]
-    ports:
-      - ${API_PORT}:8000
+    command: [ "uv", "run", "uvicorn", "--factory", "src.main:create_app", "--host", "0.0.0.0", "--workers", "${API_WORKERS_COUNT}", "--no-server-header", "--no-date-header", "--no-use-colors", "--no-access-log" ]
     volumes:
       - migrations-data:/app/migrations/versions
       - certificates-data:/app/certificates
     depends_on:
       postgres:
         condition: service_healthy
+    env_file:
+      - .env
 
   postgres:
     container_name: postgres
