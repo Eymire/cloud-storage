@@ -476,7 +476,7 @@ wheels = [
 ]
 
 [[package]]
-name = "project-three-api"
+name = "cloud-storage"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

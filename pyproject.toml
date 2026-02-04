@@ -1,5 +1,5 @@
 [project]
-name = "project-three-api"
+name = "cloud-storage"
 version = "0.1.0"
 requires-python = ">=3.13"
 dependencies = [
