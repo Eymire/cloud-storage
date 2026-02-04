@@ -13,6 +13,7 @@ def create_app() -> FastAPI:
         docs_url='/docs' if app_settings.environment == 'development' else None,
         redoc_url='/redoc' if app_settings.environment == 'development' else None,
         openapi_url='/openapi.json' if app_settings.environment == 'development' else None,
+        root_path=app_settings.root_path if app_settings.root_path else '',
     )
     app.include_router(api_router)
 

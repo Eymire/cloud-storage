@@ -12,6 +12,7 @@ class AppSettings(BaseSettings):
     )
 
     environment: Literal['development', 'production'] = 'development'
+    root_path: str | None = None
 
 
 class DatabaseSettings(BaseSettings):
