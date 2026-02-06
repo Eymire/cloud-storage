@@ -72,7 +72,7 @@ async def create_refresh_token(
     token = create_jwt(
         'refresh',
         payload,
-        timedelta(minutes=auth_settings.jwt_refresh_lifetime_minutes),
+        timedelta(days=auth_settings.jwt_refresh_lifetime_days),
     )
 
     token_hash = hashlib.sha256(token.encode()).hexdigest()

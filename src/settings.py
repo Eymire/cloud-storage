@@ -38,7 +38,7 @@ class AuthSettings(BaseSettings):
     )
 
     jwt_access_lifetime_minutes: int
-    jwt_refresh_lifetime_minutes: int
+    jwt_refresh_lifetime_days: int
     otp_expire_minutes: int
 
 
