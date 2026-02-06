@@ -1,17 +1,17 @@
-from enum import Enum
+from enum import StrEnum
 
 
-class UserSubscribePlan(str, Enum):
+class UserSubscribePlan(StrEnum):
     BASIC = 'basic'
     PLUS = 'plus'
     PRO = 'pro'
 
 
-class UserScope(str, Enum):
+class UserScope(StrEnum):
     USER = 'user'
     ADMIN = 'admin'
 
 
-class FileVisibility(str, Enum):
+class FileVisibility(StrEnum):
     PUBLIC = 'public'
     PRIVATE = 'private'
