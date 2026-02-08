@@ -4,10 +4,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: [ "uv", "run", "uvicorn", "--factory", "src.main:create_app", "--host", "0.0.0.0", "--workers", "${API_WORKERS_COUNT}", "--no-server-header", "--no-date-header", "--no-use-colors", "--no-access-log" ]
+    command: [ "uv", "run", "uvicorn", "--factory", "src.main:create_app", "--host", "0.0.0.0", "--workers", "${COMPOSE_APP_WORKERS_COUNT}", "--no-server-header", "--no-date-header", "--no-use-colors" ]
+    ports:
+      - "${COMPOSE_APP_PORT}:8000"
     volumes:
-      - migrations-data:/app/migrations/versions
       - certificates-data:/app/certificates
+      - storage-data:/app/storage
     depends_on:
       postgres:
         condition: service_healthy
@@ -25,12 +27,12 @@ services:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD", "pg_isready", "-q", "-U", "${DB_USER}", "-d", "${DB_NAME}" ]
-      interval: 5s
-      timeout: 3s
+      interval: 3s
+      timeout: 2s
       retries: 5
     restart: always
 
 volumes:
-  migrations-data: {}
   certificates-data: {}
+  storage-data: {}
   postgres-data: {}

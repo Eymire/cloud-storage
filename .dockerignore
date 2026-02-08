@@ -11,6 +11,5 @@ compose.yaml
 .env
 
 certificates/*
-migrations/versions/*
 
 README.md

@@ -12,7 +12,7 @@ class AppSettings(BaseSettings):
     )
 
     environment: Literal['development', 'production'] = 'development'
-    root_path: str | None = None
+    root_path: str = ''
 
 
 class DatabaseSettings(BaseSettings):
@@ -54,6 +54,7 @@ class SMTPSettings(BaseSettings):
     port: int
     user: str
     password: str
+    from_name: str
 
 
 app_settings = AppSettings()  # type: ignore[call-arg]

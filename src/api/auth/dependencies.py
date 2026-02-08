@@ -217,10 +217,10 @@ async def send_otp_email(to_email: str, otp: str) -> None:
     """
 
     message = EmailMessage()
-    message['From'] = f'EymireWorld <{smtp_settings.user}>'
+    message['From'] = f'{smtp_settings.from_name} <{smtp_settings.user}>'
     message['To'] = to_email
     message['Subject'] = 'Підтвердження реєстрації - OTP код'
-    message['Message-ID'] = make_msgid(domain='eymire.me')
+    message['Message-ID'] = make_msgid(domain=smtp_settings.user.split('@')[1])
     message['Date'] = formatdate()
     message.set_content(message_text)
 
