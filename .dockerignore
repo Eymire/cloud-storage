@@ -1,5 +1,5 @@
 .git
-.gitignore
+**/.gitignore
 
 Dockerfile
 compose.yaml
@@ -7,6 +7,8 @@ compose.yaml
 
 .venv/
 **/__pycache__/
+
+.ruff_cache/
 
 .env
 
