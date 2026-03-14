@@ -4,6 +4,7 @@ from collections.abc import Callable, Coroutine
 from datetime import UTC, datetime, timedelta
 from email.message import EmailMessage
 from email.utils import formatdate, make_msgid
+from pathlib import Path
 from typing import Annotated, Any, Literal, TypedDict
 
 import aiosmtplib
@@ -11,7 +12,7 @@ import jwt
 from argon2 import PasswordHasher
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from sqlalchemy import delete, select
+from sqlalchemy import delete, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_session
@@ -63,8 +64,6 @@ async def create_refresh_token(
     user_id: int,
     session: AsyncSession,
 ) -> str:
-    from sqlalchemy import insert
-
     payload = {
         'user_id': user_id,
     }
@@ -102,14 +101,14 @@ def create_jwt(
 
 
 def encode_jwt(payload: dict) -> str:
-    with open('./certificates/jwt-private.pem', encoding='utf-8') as key_file:
+    with Path('./certificates/jwt-private.pem').open(encoding='utf-8') as key_file:
         private_key = key_file.read()
 
     return jwt.encode(payload, private_key, 'RS256')
 
 
 def decode_jwt(token: str) -> JWTPayload | None:
-    with open('./certificates/jwt-public.pem', encoding='utf-8') as key_file:
+    with Path('./certificates/jwt-public.pem').open(encoding='utf-8') as key_file:
         public_key = key_file.read()
 
     try:
